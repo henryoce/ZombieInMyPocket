@@ -38,9 +38,9 @@ class Main(cmd.Cmd):
         self._game = Game(9, level, self._card_manager.get_deck())
         self._pickle_manager = PickleManager()
 
-        print(self._game._level.get_tile_player_is_on().get_tile_sides())
-        print(self._card_manager.get_deck())
-        pprint(vars(self._card_manager.get_deck()[0]))
+        # print(self._game._level.get_tile_player_is_on().get_tile_sides())
+        # print(self._card_manager.get_deck())
+        # pprint(vars(self._card_manager.get_deck()[0]))
 
     def do_help(self, args):
         """Show commands."""
@@ -59,14 +59,18 @@ class Main(cmd.Cmd):
 
     def do_player_health(self, args):
         """Show player health"""
+        assert self._player.get_health(), "Could not get player health"
         print(f"Health: {self._player.get_health()}")
 
     def do_player_attack(self, args):
         """Show player attack damage"""
+        assert self._player.get_attack_score(), "Could not get player attack score"
         print(f"Attack: {self._player.get_attack_score()}")
 
-    def do_stats(self):
+    def do_stats(self, args):
         """Show player stats"""
+        assert self._player.get_health(), "Could not get player health"
+        assert self._player.get_attack_score(), "Could not get player attack score"
         print(f"Health: {self._player.get_health()}\nAttack: {self._player.get_attack_score()}")
 
     def do_rename(self, args):
@@ -84,8 +88,13 @@ class Main(cmd.Cmd):
                 new_cmd = input("New command name: ")
             if new_cmd.isspace():
                 raise TypeError("Blank response")
+            if new_cmd == command:
+                raise ValueError("Cannot rename command to the same name")
             self.aliases[new_cmd] = self.aliases[command]
             del self.aliases[command]
+
+            assert new_cmd in self.aliases, f"Command '{command}' was not successfully renamed to '{new_cmd}'"
+            assert not command in self.aliases, f"Original command '{command}' was not successfully removed"
             # self.cmd.__name__ = "do_{}".format(new_cmd)
             print(f"Successfully changed {command} to {new_cmd}")
         else:
@@ -110,11 +119,13 @@ class Main(cmd.Cmd):
             self._game = self._pickle_manager.deserialize_file_to_object(file_name)
         except NoFileNameError:
             print("You need a file name!! 'load_game [file_name] Try Again")
+        except FileNotFoundError:
+            print(f"File not found '{file_name}'")
 
     def default(self, line):
         command, args, line = self.parseline(line)
-        if command in self.aliases:
-            return self.aliases[command](args)
+        if command.lower() in self.aliases:
+            return self.aliases[command.lower()](args)
         else:
             print(f"--- Unknown command: {line}")
 
