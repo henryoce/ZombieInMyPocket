@@ -43,38 +43,57 @@ class Main(cmd.Cmd):
         # pprint(vars(self._card_manager.get_deck()[0]))
 
     def do_help(self, args):
-        """Show commands."""
+        """
+        help <command>
+        Show commands
+        """
         if args in self.aliases:
             args = self.aliases[args].__name__[3:]
             cmd.Cmd.do_help(self, args)
         else:
-            print("Documented commands (type help <topic>):\n========================================")
+            print("Documented commands (type help <command>):\n========================================")
             for key in self.aliases.keys():
-                print(key)
+                print(f"$ {key}")
+                cmd.Cmd.do_help(self, self.aliases[key].__name__[3:])
             print("========================================")
 
     def do_quit(self, args):
-        """Exit the program."""
+        """
+        quit
+        Exit the program
+        """
         return True
 
     def do_player_health(self, args):
-        """Show player health"""
+        """
+        health
+        Show player health
+        """
         assert self._player.get_health(), "Could not get player health"
         print(f"Health: {self._player.get_health()}")
 
     def do_player_attack(self, args):
-        """Show player attack damage"""
+        """
+        attack
+        Show player attack damage
+        """
         assert self._player.get_attack_score(), "Could not get player attack score"
         print(f"Attack: {self._player.get_attack_score()}")
 
     def do_stats(self, args):
-        """Show player stats"""
+        """
+        stats
+        Show player stats
+        """
         assert self._player.get_health(), "Could not get player health"
         assert self._player.get_attack_score(), "Could not get player attack score"
         print(f"Health: {self._player.get_health()}\nAttack: {self._player.get_attack_score()}")
 
     def do_rename(self, args):
-        """Rebind commands"""
+        """
+        rename <command> <newcommand>
+        Rebind commands, can also be used without arguments
+        """
         if len(args.split()) > 0:
             command = args.split()[0]
         else:
