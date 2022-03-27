@@ -101,14 +101,22 @@ class Main(cmd.Cmd):
 
         # if "do_{}".format(cmd) in dir(Main):
         if command in self.aliases:
-            if len(args.split()) > 1:
-                new_cmd = args.split()[1]
-            else:
-                new_cmd = input("New command name: ")
-            if new_cmd.isspace():
-                raise TypeError("Blank response")
-            if new_cmd in self.aliases:
-                raise ValueError("Command name is already in use")
+            while True:
+                try:
+                    if len(args.split()) > 1:
+                        new_cmd = args.split()[1]
+                    else:
+                        new_cmd = input("New command name: ")
+                    if new_cmd.isspace() or new_cmd == '':
+                        raise TypeError()
+                    if new_cmd in self.aliases:
+                        raise ValueError()
+                    break
+                except TypeError:
+                    print("Blank response")
+                    pass
+                except ValueError:
+                    return print("Command name is already in use")
             self.aliases[new_cmd] = self.aliases[command]
             del self.aliases[command]
 
