@@ -107,8 +107,8 @@ class Main(cmd.Cmd):
                 new_cmd = input("New command name: ")
             if new_cmd.isspace():
                 raise TypeError("Blank response")
-            if new_cmd == command:
-                raise ValueError("Cannot rename command to the same name")
+            if new_cmd in self.aliases:
+                raise ValueError("Command name is already in use")
             self.aliases[new_cmd] = self.aliases[command]
             del self.aliases[command]
 
